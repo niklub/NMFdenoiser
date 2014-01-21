@@ -35,11 +35,12 @@ function [output_file] = NMFdenoiser(input_file, params)
 if nargin<2
     params = struct();
 end
-if params.show_log
-    fprintf('Reading input file %s...\n', input_file);
-end
+
 [audio, sr] = wavread(input_file);
 params = initParams(params, sr);
+if params.show_log
+    fprintf('Processing input file %s...\n', input_file);
+end
 Saudio = m_STFT(audio, sr, params);
 Yaudio = abs(Saudio);
 
