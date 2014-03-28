@@ -31,7 +31,8 @@ function [output_file] = NMFdenoiser(input_file, params)
 %   params.num_noise_atoms (16) number of noise atoms
 %   params.max_harms (30)       number of harmonics per each F0
 %   params.show_log (true)      show messages
-
+%   params.alpha(.2)            parameter controls envelope smoothness
+%   params.speech_sparsity(.2)  parameter controls speech sparsity
 if nargin<2
     params = struct();
 end
@@ -124,4 +125,6 @@ if ~isfield(pout, 'num_noise_atoms') pout.num_noise_atoms = 16; end
 if ~isfield(pout, 'max_harms')      pout.max_harms = 30; end
 if ~isfield(pout, 'output')         pout.output = ''; end
 if ~isfield(pout, 'show_log')       pout.show_log = true; end
+if ~isfield(pout, 'alpha')          pout.alpha = .2; end
+if ~isfield(pout, 'speech_sparsity')          pout.speech_sparsity = .2; end
 end
