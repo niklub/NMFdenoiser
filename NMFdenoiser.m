@@ -32,7 +32,9 @@ function [output_file] = NMFdenoiser(input_file, params)
 %   params.max_harms (30)       number of harmonics per each F0
 %   params.show_log (true)      show messages
 %   params.alpha(.2)            parameter controls envelope smoothness
+%   params.energyThr (-40)      logRMS threshold in dB used in energy-based VAD
 %   params.speech_sparsity(.2)  parameter controls speech sparsity
+
 if nargin<2
     params = struct();
 end
@@ -53,9 +55,15 @@ if isempty(params.noise)
         vad = vadsohn(audio, sr);
     else
         fprintf('WARNING! voicebox is not installed. The results could be inaccurrate\n');
-        vad = m_energyVAD(audio);
+        vad_params.threshold = params.energyThr;
+        vad = energyVAD(audio, vad_params);
     end
     noise_profile = audio(vad==0);
+    if isempty(noise_profile)
+        fprintf('Unable to find noise profile with prespecified params.energyThr. Using first samples instead\n');
+        noise_profile = audio(1:round(numel(audio)/10));
+    end
+        
 else
     if params.show_log
         fprintf('Extracting noise profile from file %s...\n', params.noise);
@@ -125,6 +133,7 @@ if ~isfield(pout, 'num_noise_atoms') pout.num_noise_atoms = 16; end
 if ~isfield(pout, 'max_harms')      pout.max_harms = 30; end
 if ~isfield(pout, 'output')         pout.output = ''; end
 if ~isfield(pout, 'show_log')       pout.show_log = true; end
+if ~isfield(pout, 'energyThr')       pout.energyThr = -40; end
 if ~isfield(pout, 'alpha')          pout.alpha = .2; end
 if ~isfield(pout, 'speech_sparsity')          pout.speech_sparsity = .2; end
 end
